@@ -1,6 +1,5 @@
 #include <lcom/lcf.h>
 #include <lcom/lab2.h>
-#include "i8254.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -30,17 +29,23 @@ int main(int argc, char *argv[]) {
 }
 
 int(timer_test_read_config)(uint8_t timer, enum timer_status_field field) {
-    /* To be implemented by the students */
-    printf("%s is not yet implemented!\n", __func__);
-    
-    // enviar o comando Read Back
-    sys_outb(TIMER_CTRL, TIMER_RB_CMD | TIMER_RB_STATUS_ | TIMER_RB_SEL(0));
 
-    // Ler o LSB e MSB do Timer 0
-    //unsigned count = inb(TIMER_0);        // Low byte (LSB)
-    //count |= inb(TIMER_0) << 8;        // High byte (MSB)
-
+  if(timer < 0 || timer > 2)
+  {
+    printf("timer_test_read_config::Invalid timer input\n");
     return 1;
+  }
+  
+  uint8_t temp;
+  
+  //check if timer_get_conf was successful
+  if(timer_get_conf(timer, &temp) != OK){
+    return 1;}
+
+  if(timer_display_conf(timer,temp, field) != OK){
+    return 1;}
+
+  return 0;
 }
 
 int(timer_test_time_base)(uint8_t timer, uint32_t freq) {
