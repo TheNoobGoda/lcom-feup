@@ -88,73 +88,7 @@ uint8_t countMode(uint8_t st){
 
 int (timer_display_conf)(uint8_t timer, uint8_t st,
                         enum timer_status_field field) {
-  union timer_status_field_val status;
-
-  switch (field)
-  {
-    case tsf_all:
-      status.byte = st;
-      break;
-    case tsf_initial:
-      switch(st & TIMER_LSB_MSB){
-        case(TIMER_LSB):
-          status.in_mode = LSB_only;
-          break;
-
-        case(TIMER_MSB):
-          status.in_mode = MSB_only;
-          break;
-
-        case(TIMER_LSB_MSB):
-          status.in_mode = MSB_after_LSB;
-          break;
-
-        default:
-          status.in_mode = INVAL_val;
-          break;
-      }
-      break;
-    case tsf_mode:
-       switch(st & TIMER_OPERATING_MODE){
-        case(TIMER_INT_TERM_COUNT):
-          status.count_mode = 0;
-          break;
-        case(TIMER_HW_RETRIG_ONES):
-          status.count_mode = 1;
-          break;
-        case(TIMER_RATE_GEN):
-          status.count_mode = 2;
-          break;
-        case(BIT(3) | TIMER_RATE_GEN): //alternative to mode 2 (110)
-          status.count_mode = 2; 
-          break;
-        case(TIMER_SQR_WAVE):
-          status.count_mode = 3;
-          break;
-        case(BIT(3) | TIMER_SQR_WAVE): //alternative to mode 3 (111)
-          status.count_mode = 3; 
-          break;
-        case(TIMER_SW_TRIG_STROBE):
-          status.count_mode = 4;
-          break;
-        case(TIMER_HW_TRIG_STROBE):
-          status.count_mode = 5;
-          break;
-        }
-      break;
-    case tsf_base:
-      if((BIT(0) & st)==1)
-        status.bcd=true;
-      else 
-        status.bcd=false;
-    default: 
-      printf("timer_display_conf::Invalid field inserted\n");
-      return 1;
-  }
-
-  if(timer_print_config(timer,field,status) != OK){
-    return 1;
-  }
+  //union timer_status_field_val status;
 
   return 0;
 }
