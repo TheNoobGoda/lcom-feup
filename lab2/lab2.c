@@ -30,10 +30,17 @@ int main(int argc, char *argv[]) {
 }
 
 int(timer_test_read_config)(uint8_t timer, enum timer_status_field field) {
-  /* To be implemented by the students */
-  printf("%s is not yet implemented!\n", __func__);
+    /* To be implemented by the students */
+    printf("%s is not yet implemented!\n", __func__);
+    
+    // enviar o comando Read Back
+    sys_outb(TIMER_CTRL, TIMER_RB_CMD | TIMER_RB_STATUS_ | TIMER_RB_SEL(0));
 
-  return 1;
+    // Ler o LSB e MSB do Timer 0
+    //unsigned count = inb(TIMER_0);        // Low byte (LSB)
+    //count |= inb(TIMER_0) << 8;        // High byte (MSB)
+
+    return 1;
 }
 
 int(timer_test_time_base)(uint8_t timer, uint32_t freq) {
