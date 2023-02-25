@@ -6,10 +6,53 @@
 #include "i8254.h"
 
 int (timer_set_frequency)(uint8_t timer, uint32_t freq) {
-  /* To be implemented by the students */
-  printf("%s is not yet implemented!\n", __func__);
+  uint8_t st;
+  timer_get_conf(timer,&st);
 
-  return 1;
+  st = st & 0x0f; // to keep the last 4 bits unchanged
+
+  uint16_t init = TIMER_FREQ/freq;
+  uint8_t msb,lsb;
+  util_get_LSB(init,&lsb);
+  util_get_MSB(init,&msb);
+
+  uint8_t timer_sel;
+  switch (timer)
+  {
+  case 0:
+    timer_sel = TIMER_SEL0;
+    break;
+  
+  case 1:
+    timer_sel = TIMER_SEL1;
+    break;
+
+  case 2:
+    timer_sel = TIMER_SEL2;
+    break;
+
+  default:
+    printf("Error invalid timer\n");
+    return 1;
+    break;
+  }
+
+  if(sys_outb(TIMER_CTRL,timer_sel|TIMER_LSB_MSB|st) !=0){
+    printf("Error on sys_outb\n");
+    return 1;
+  }
+
+  if(sys_outb(TIMER_0+timer,lsb) != 0){
+    printf("Error on sys_outb\n");
+    return 1;
+  }
+
+  if(sys_outb(TIMER_0+timer,msb) != 0){
+    printf("Error on sys_outb\n");
+    return 1;
+  }
+
+  return 0;
 }
 
 int (timer_subscribe_int)(uint8_t *bit_no) {
