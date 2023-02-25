@@ -29,22 +29,14 @@ int main(int argc, char *argv[]) {
 }
 
 int(timer_test_read_config)(uint8_t timer, enum timer_status_field field) {
-
-  if(timer < 0 || timer > 2)
-  {
-    printf("timer_test_read_config::Invalid timer input\n");
-    return 1;
-  }
   
-  uint8_t temp;
+  uint8_t st;
   
-  //check if timer_get_conf was successful
-  if(timer_get_conf(timer, &temp) != OK){
-    return 1;}
+  if(timer_get_conf(timer, &st) != 0) return 1;
 
-  if(timer_display_conf(timer,temp, field) != OK){
-    return 1;}
-
+  if(timer_display_conf(timer,st, field) != 0) return 1;
+  
+  
   return 0;
 }
 
