@@ -50,7 +50,44 @@ int (timer_display_conf)(uint8_t timer, uint8_t st,
                         enum timer_status_field field) {
   
   union timer_status_field_val conf;
-  conf.byte = st;
+  
+  switch (field)
+  {
+  case tsf_all:
+    conf.byte = st;
+    printf("all\n");
+    break;
+  
+  case tsf_initial:
+    switch (st & TIMER_LSB_MSB)
+    {
+      case TIMER_LSB:
+        conf.in_mode = LSB_only;
+       break;
+      case TIMER_MSB:
+        conf.in_mode = MSB_only;
+        break;
+      case TIMER_LSB_MSB:
+        conf.in_mode = MSB_after_LSB;
+        break;
+
+      default:
+        conf.in_mode = INVAL_val;
+        break;
+    }
+    printf("init\n");
+    break;
+  
+  case tsf_mode:
+    break;
+  
+  case tsf_base:
+    break;
+  
+  default:
+    break;
+  }
+
   timer_print_config(timer,field,conf);
 
   return 0;
