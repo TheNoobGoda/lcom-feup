@@ -55,7 +55,6 @@ int (timer_display_conf)(uint8_t timer, uint8_t st,
   {
   case tsf_all:
     conf.byte = st;
-    printf("all\n");
     break;
   
   case tsf_initial:
@@ -75,16 +74,23 @@ int (timer_display_conf)(uint8_t timer, uint8_t st,
         conf.in_mode = INVAL_val;
         break;
     }
-    printf("init\n");
     break;
   
   case tsf_mode:
+    conf.count_mode = (st &(BIT(1) | BIT(2) | BIT(3)))>>1;
+    if(conf.count_mode == 6) conf.count_mode = 2;
+    if(conf.count_mode == 7) conf.count_mode = 3;
     break;
   
   case tsf_base:
+    if (st & TIMER_BCD) conf.bcd = TIMER_BCD;
+    else conf.bcd = TIMER_BIN;
+    printf("base\n");
     break;
   
   default:
+    printf("Invalid field\n");
+    return 1;
     break;
   }
 
