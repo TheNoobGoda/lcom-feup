@@ -30,8 +30,11 @@ int main(int argc, char *argv[]) {
 }
 
 int(kbd_test_scan)() {
-    //uint8_t bit_no1,bit_no2; 
-    //keyboard_subscribe_int(&bit_no1,&bit_no2);
+    uint8_t bit_no;
+    keyboard_subscribe_interrupts(&bit_no);
+
+    keyboard_unsubscribe_interrupts();
+
     return 0;
 }
 
