@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+extern int global_time;
+
 int main(int argc, char *argv[]) {
   // sets the language of LCF messages (can be either EN-US or PT-PT)
   lcf_set_language("EN-US");
@@ -45,31 +47,46 @@ int(timer_test_time_base)(uint8_t timer, uint32_t freq) {
 }
 
 int(timer_test_int)(uint8_t time) {
+  printf("time : %d\n",time);
   
   int ipc_status,r;
   uint8_t irq_set;
-
   message msg;
-  timer_subscribe_int(&irq_set);
- 
-  while(global_time<time){
-    if(r= driver_ready(ANY, &msg,&ipc_status) !=0){
-      printf("driver ready failed with %d\n",r);
-      continue;
-    }
 
-    if (is_ipc_notify(ipc_status)) {
-      switch (_ENDPOINT_P(msg.m_source)) {
-        case HARDWARE:
-        if (msg.m_notify.interrupts & irq_set) {
-          timer_int_handler();
+  if (timer_subscribe_int(&irq_set) !=0){
+    printf("error timer_subscribe_int\n");
+    return 1;
+  }
+ 
+  while( (global_time/60.0) <time ) { /* Run until it has exceeeded time*/;
+      /* Get a request message */
+    if ( (r = driver_receive(ANY, &msg, &ipc_status)) != 0 ) { 
+          printf("driver_receive failed with: %d", r);
+          continue;
+    }
+      if (is_ipc_notify(ipc_status)) { /* received notification */
+        switch (_ENDPOINT_P(msg.m_source)) {
+          case HARDWARE: /* hardware interrupt notification */	
+            
+            if (msg.m_notify.interrupts &irq_set) { /* subscribed interrupt */
+              
+                    timer_int_handler();   /* process it */
+                    if((global_time%60)==0)
+                      timer_print_elapsed_time();
+            }
+            break;
+            default:
+              break; /* no other notifications expected: do nothing */	
         }
-        break;
-      }
+      } else { /* received a standard message, not a notification */
+          /* no standard messages expected: do nothing */
     }
   }
 
-  timer_unsubscribe_int();
+  if (timer_unsubscribe_int() !=0){
+    printf("error timer_subscribe_int\n");
+    return 1;
+  }
   
 
   return 0;
