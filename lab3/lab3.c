@@ -4,6 +4,11 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "keyboard.h"
+#include "time.h"
+
+extern int global_time;
+extern uint8_t scancode;
 
 int main(int argc, char *argv[]) {
   // sets the language of LCF messages (can be either EN-US or PT-PT)
@@ -30,10 +35,35 @@ int main(int argc, char *argv[]) {
 }
 
 int(kbd_test_scan)() {
-    uint8_t bit_no;
-    keyboard_subscribe_interrupts(&bit_no);
+  int ipc_status;
+  uint8_t irq_set;
+  message msg;
 
-    keyboard_unsubscribe_interrupts();
+  if (keyboard_subscribe_interrupts(&irq_set) != 0)
+    return 1;
+
+  while(scancode != BREAK_ESC) {
+    if (driver_receive(ANY, &msg, &ipc_status) != 0) {
+      printf("Error");
+      continue;
+    }
+
+    if (is_ipc_notify(ipc_status)) {
+      switch(_ENDPOINT_P(msg.m_source)){
+        case HARDWARE:
+          if (msg.m_notify.interrupts & irq_set) {
+            kbc_ih();
+          }
+        }
+      }
+    }
+
+  if (keyboard_unsubscribe_interrupts() != 0)
+    return 1;
+  if (kbd_print_no_sysinb(global_time) != 0)
+    return 1;
+
+  return 0;
 
     return 0;
 }

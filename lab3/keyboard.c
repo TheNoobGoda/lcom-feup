@@ -1,13 +1,13 @@
 #include <lcom/lcf.h>
 #include <keyboard.h>
-#include "KBC.c"
 
 int kb_hook_id = 1;
+uint8_t scancode =0;
 
 int (keyboard_subscribe_interrupts)(uint8_t *bit_no) {
     *bit_no = BIT(kb_hook_id);
 
-    if(sys_irqsetpolicy(1,IRQ_REENABLE | IRQ_EXCLUSIVE,&kb_hook_id)!=0){
+    if(sys_irqsetpolicy(IRQ_KEYBOARD,IRQ_REENABLE | IRQ_EXCLUSIVE,&kb_hook_id)!=0){
       printf("Error in setting policy\n");
       return 1;
     }
@@ -47,7 +47,7 @@ void (kbc_ih)() {
     if (output & MAKE_CODE) make = FALSE;
     else make = TRUE;
 
-    kbd_print_scancode(make,1,bytes);
+    kbd_print_scancode(make,size,bytes);
 }
 
 int (keyboard_restore)(){

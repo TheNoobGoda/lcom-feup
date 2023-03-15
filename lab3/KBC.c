@@ -7,7 +7,7 @@ int (read_KBC_status)(uint8_t* status){
 
 int (read_KBC_output)(uint8_t port, uint8_t *output){
     uint8_t status;
-    uint8_t attemps = 10;
+    uint8_t attemps = MAX_ATTEMPS;
     
     while (attemps) {
         if (read_KBC_status(&status) != 0) { // ler o status
@@ -38,7 +38,7 @@ int (read_KBC_output)(uint8_t port, uint8_t *output){
           return 0;
         }
     
-        tickdelay(micros_to_ticks(20000));
+        //tickdelay(micros_to_ticks(WAIT_KBC));
         attemps--;
     }
  
@@ -48,7 +48,7 @@ int (read_KBC_output)(uint8_t port, uint8_t *output){
 
 int (write_KBC_command)(uint8_t port, uint8_t commandByte){
     uint8_t status;
-    uint8_t attemps = 10;
+    uint8_t attemps = MAX_ATTEMPS;
 
     while (attemps) {
         if (read_KBC_status(&status) != 0) { // ler o status
